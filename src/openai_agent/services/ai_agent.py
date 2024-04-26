@@ -26,9 +26,8 @@ class Developer:
 
             function_call = response_message.get('function_call')
             if not function_call:
-                answer = response_message.content
-                self.messages.append(answer)
-                return answer['content']
+                self.messages.append(response_message)
+                return response_message.content
             match function_call['name']:
                 case http_openai.Func.bash:
                     raw_args = function_call['arguments']
@@ -80,11 +79,10 @@ class Reviewer:
 
             function_call = response_message.get('function_call')
             if not function_call:
-                answer = response_message.content
-                self.messages.append(answer)
-                if answer['content'].lower() == 'готово':
+                self.messages.append(response_message)
+                if response_message.content.lower() == 'готово':
                     return None
-                return answer['content']
+                return response_message.content
             match function_call['name']:
                 case http_openai.Func.bash:
                     raw_args = function_call['arguments']
