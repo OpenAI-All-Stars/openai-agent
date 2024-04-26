@@ -6,6 +6,7 @@ from simple_settings import settings
 
 class Func(str, Enum):
     bash = 'bash'
+    python = 'python'
 
 
 FUNCTIONS = [
@@ -21,6 +22,20 @@ FUNCTIONS = [
                 },
             },
             'required': ['command'],
+        },
+    },
+    {
+        'name': Func.python,
+        'description': 'Execute python code',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'code': {
+                    'type': 'string',
+                    'description': 'Code',
+                },
+            },
+            'required': ['code'],
         },
     },
 ]
