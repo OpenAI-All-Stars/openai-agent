@@ -5,43 +5,93 @@ from simple_settings import settings
 
 
 class Func(str, Enum):
-    bash = 'bash'
-    python = 'python'
+    bash_command = 'bash_command'
+    list_files = 'list_files'
+    make_folder = 'make_folder'
+    make_file = 'make_file'
+    show_file = 'show_file'
 
 
 FUNCTIONS = [
     {
-        'name': Func.bash,
-        'description': 'Execute any bash command in Linux',
+        'name': Func.bash_command,
+        'description': 'Execute bash command',
         'parameters': {
             'type': 'object',
             'properties': {
                 'command': {
                     'type': 'string',
-                    'description': 'Bash command body',
+                    'description': 'Bash command line',
                 },
             },
             'required': ['command'],
         },
     },
     {
-        'name': Func.python,
-        'description': 'Execute python code',
+        'name': Func.list_files,
+        'description': 'List folders and files',
         'parameters': {
             'type': 'object',
             'properties': {
-                'code': {
+                'path': {
                     'type': 'string',
-                    'description': 'Code',
+                    'description': 'Path for list',
                 },
             },
-            'required': ['code'],
+            'required': ['path'],
+        },
+    },
+    {
+        'name': Func.make_folder,
+        'description': 'Make folder in project',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'path': {
+                    'type': 'string',
+                    'description': 'Path to folder',
+                },
+            },
+            'required': ['path'],
+        },
+    },
+    {
+        'name': Func.make_file,
+        'description': 'Create or replace file in project',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'path': {
+                    'type': 'string',
+                    'description': 'Path with filename',
+                },
+                'source': {
+                    'type': 'string',
+                    'description': 'Source of file',
+                },
+            },
+            'required': ['path', 'source'],
+        },
+    },
+    {
+        'name': Func.show_file,
+        'description': 'Show file in project',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'path': {
+                    'type': 'string',
+                    'description': 'Path to file',
+                },
+            },
+            'required': ['path'],
         },
     },
 ]
 
 
 async def send(user: str, messages: list[dict]) -> OpenAIObject:
+    openai.proxy = settings.PROXY
     return await openai.ChatCompletion.acreate(
         api_key=settings.OPENAI_API_KEY,
         model=settings.OPENAI_MODEL,

@@ -3,4 +3,5 @@ SIMPLE_SETTINGS = {
 }
 
 OPENAI_API_KEY = ''
-OPENAI_MODEL = ''
+OPENAI_MODEL = 'gpt-4o'
+PROXY: str | None = None

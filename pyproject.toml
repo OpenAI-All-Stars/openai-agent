@@ -13,6 +13,8 @@ python = "^3.12"
 openai = "^0.28.1"
 click = "^8.1.7"
 simple-settings = "^1.2.0"
+flet = "^0.22.0"
+colorama = "^0.4.6"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.4.0"
