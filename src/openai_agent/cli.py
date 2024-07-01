@@ -1,6 +1,7 @@
 import logging
 
 import click
+from colorama import init
 
 from openai_agent.services import ai_agent
 from openai_agent.utils import async_command
@@ -8,7 +9,10 @@ from openai_agent.utils import async_command
 
 @click.group()
 def cli() -> None:
+    init()
     logging.basicConfig(level=logging.INFO)
+    openai_logger = logging.getLogger('openai')
+    openai_logger.setLevel(logging.ERROR)
 
 
 @cli.command()
@@ -17,14 +21,11 @@ def cli() -> None:
 async def run(task: str) -> None:
     try:
         developer = ai_agent.Developer()
-        reviewer = ai_agent.Reviewer(task)
-        comments = task
         while True:
-            result = await developer.work(comments)
+            result = await developer.work(task)
             print(result)
-            comments = await reviewer.check_work(result)
-            if not comments:
+            task = input('> ')
+            if not task:
                 break
-            print(comments)
     except KeyboardInterrupt:
         pass
