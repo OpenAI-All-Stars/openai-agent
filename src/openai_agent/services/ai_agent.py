@@ -48,7 +48,7 @@ async def function_loop(messages: list[dict]) -> OpenAIObject:
                     raise Exception('команда не указана')
 
                 print_fn('bash: {}'.format(command))
-                
+
                 proc = await asyncio.create_subprocess_shell(
                     command,
                     stdout=asyncio.subprocess.PIPE,

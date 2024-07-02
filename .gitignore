@@ -2,3 +2,7 @@
 __pycache__
 .tox
 .mypy_cache
+.env
+.venv
+build
+*.egg-info

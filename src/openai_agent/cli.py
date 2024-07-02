@@ -1,7 +1,10 @@
+from getpass import getpass
 import logging
+import os
 
 import click
 from colorama import init
+from dotenv import load_dotenv, find_dotenv, set_key
 
 from openai_agent.services import ai_agent
 from openai_agent.utils import async_command
@@ -10,6 +13,16 @@ from openai_agent.utils import async_command
 @click.group()
 def cli() -> None:
     init()
+    load_dotenv()
+
+    key_name = 'OPENAI_API_KEY'
+    key = os.getenv(key_name)
+    if not key:
+        key = getpass(f'{key_name}: ')
+        dotenv_path = find_dotenv()
+        set_key(dotenv_path, key_name, key)
+        print(f'Секрет {key_name} сохранён в {dotenv_path}.')
+
     logging.basicConfig(level=logging.INFO)
     openai_logger = logging.getLogger('openai')
     openai_logger.setLevel(logging.ERROR)

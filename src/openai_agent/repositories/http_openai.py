@@ -1,7 +1,7 @@
 from enum import Enum
+import os
 import openai
 from openai.openai_object import OpenAIObject
-from simple_settings import settings
 
 
 class Func(str, Enum):
@@ -91,10 +91,10 @@ FUNCTIONS = [
 
 
 async def send(user: str, messages: list[dict]) -> OpenAIObject:
-    openai.proxy = settings.PROXY
+    openai.proxy = os.getenv('PROXY')  # type: ignore
     return await openai.ChatCompletion.acreate(
-        api_key=settings.OPENAI_API_KEY,
-        model=settings.OPENAI_MODEL,
+        api_key=os.getenv('OPENAI_API_KEY'),
+        model='gpt-4o',
         messages=messages,
         functions=FUNCTIONS,
         function_call='auto',
