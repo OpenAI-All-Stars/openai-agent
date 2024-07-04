@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import contextmanager
 import functools
+import signal
 import sys
 import time
 from typing import Callable
@@ -43,8 +44,18 @@ class SpinningThread(Thread):
 def spinning_ctx():
     t = SpinningThread()
     t.start()
+
+    def signal_handler(sig, frame):
+        t.stop = True
+        t.join()
+        sys.stdout.write('\b\b')
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     try:
         yield
     finally:
-        t.stop = True
-        t.join()
+        if not t.stop:
+            t.stop = True
+            t.join()
