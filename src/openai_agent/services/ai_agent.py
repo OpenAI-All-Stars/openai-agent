@@ -5,6 +5,7 @@ from colorama import Fore, Style
 from openai.openai_object import OpenAIObject
 
 from openai_agent.repositories import http_openai, project_files
+from openai_agent.utils import spinning_ctx
 
 
 class Developer:
@@ -32,7 +33,8 @@ class Developer:
 
 async def function_loop(messages: list[dict]) -> OpenAIObject:
     while True:
-        resp = await http_openai.send('developer', messages)
+        with spinning_ctx():
+            resp = await http_openai.send('developer', messages)
         response_message = resp.choices[0].message
 
         function_call = response_message.get('function_call')

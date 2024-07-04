@@ -10,15 +10,13 @@ from openai_agent.utils import async_command
 
 @click.group()
 def cli() -> None:
+    logging.basicConfig(level=logging.ERROR)
+
     colorama.init()
     dotenv.init()
 
     dotenv.set_secret('OPENAI_API_KEY')
     dotenv.set_secret('PROXY')
-
-    logging.basicConfig(level=logging.INFO)
-    openai_logger = logging.getLogger('openai')
-    openai_logger.setLevel(logging.ERROR)
 
 
 @cli.command()

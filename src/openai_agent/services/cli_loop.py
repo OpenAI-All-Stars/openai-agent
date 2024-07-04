@@ -6,8 +6,6 @@ from openai_agent.services import ai_agent
 
 async def run(task: str):
     readline.parse_and_bind("tab: complete")
-    #readline.parse_and_bind('"\e[A": history-search-backward')
-    #readline.parse_and_bind('"\e[B": history-search-forward')
 
     developer = ai_agent.Developer()
     if not task:
