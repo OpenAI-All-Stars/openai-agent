@@ -1,12 +1,10 @@
-from getpass import getpass
 import logging
-import os
 
 import click
 import colorama
 
 from openai_agent.repositories import dotenv
-from openai_agent.services import ai_agent
+from openai_agent.services import cli_loop
 from openai_agent.utils import async_command
 
 
@@ -28,14 +26,6 @@ def cli() -> None:
 @async_command
 async def run(task: str) -> None:
     try:
-        developer = ai_agent.Developer()
-        if not task:
-            task = input('> ')
-        while True:
-            result = await developer.work(task)
-            print(result)
-            task = input('> ')
-            if not task:
-                break
+        await cli_loop.run(task)
     except KeyboardInterrupt:
         pass

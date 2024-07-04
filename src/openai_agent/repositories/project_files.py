@@ -21,5 +21,8 @@ def make_file(path: str, source: str) -> None:
 
 
 def show_file(path: str) -> str:
-    with open(path) as f:
-        return f.read()
+    try:
+        with open(path) as f:
+            return f.read()
+    except FileNotFoundError as e:
+        return str(e)
