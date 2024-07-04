@@ -2,7 +2,6 @@ import asyncio
 import json
 
 from colorama import Fore, Style
-from openai.openai_object import OpenAIObject
 
 from openai_agent.repositories import http_openai, project_files
 from openai_agent.utils import spinning_ctx
@@ -31,7 +30,7 @@ class Developer:
         return response_message.content
 
 
-async def function_loop(messages: list[dict]) -> OpenAIObject:
+async def function_loop(messages: list[dict]):
     while True:
         with spinning_ctx():
             resp = await http_openai.send('developer', messages)
