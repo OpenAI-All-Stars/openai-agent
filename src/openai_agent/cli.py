@@ -3,28 +3,20 @@ import logging
 import os
 
 import click
-from colorama import init
-from dotenv import load_dotenv, set_key
+import colorama
 
+from openai_agent.repositories import dotenv
 from openai_agent.services import ai_agent
 from openai_agent.utils import async_command
 
 
 @click.group()
 def cli() -> None:
-    init()
-    dotenv_path = os.path.expanduser('~/.openai-agent')
-    if not os.path.exists(dotenv_path):
-        with open(dotenv_path, 'w'):
-            pass
-    load_dotenv(dotenv_path)
+    colorama.init()
+    dotenv.init()
 
-    key_name = 'OPENAI_API_KEY'
-    key = os.getenv(key_name)
-    if not key:
-        key = getpass(f'{key_name}: ')
-        set_key(dotenv_path, key_name, key)
-        print(f'Секрет {key_name} сохранён в {dotenv_path}.')
+    dotenv.set_secret('OPENAI_API_KEY')
+    dotenv.set_secret('PROXY')
 
     logging.basicConfig(level=logging.INFO)
     openai_logger = logging.getLogger('openai')
@@ -32,11 +24,13 @@ def cli() -> None:
 
 
 @cli.command()
-@click.option('--task', required=True)
+@click.option('--task')
 @async_command
 async def run(task: str) -> None:
     try:
         developer = ai_agent.Developer()
+        if not task:
+            task = input('> ')
         while True:
             result = await developer.work(task)
             print(result)
