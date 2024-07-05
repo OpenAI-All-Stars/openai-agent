@@ -13,8 +13,8 @@ OPENAI_API_KEY=xxx
 PROXY=zzz
 ```
 
-OPENAI_API_KEY - ваш ключ от openai api
-PROXY - прокси, если нужен, можно оставить пустым
+* OPENAI_API_KEY - ваш ключ от openai api
+* PROXY - прокси, если нужен, можно оставить пустым
 
 ## Пример использования
 
