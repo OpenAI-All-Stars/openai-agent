@@ -59,3 +59,58 @@ def spinning_ctx():
         if not t.stop:
             t.stop = True
             t.join()
+
+
+async def read_stream(reader, buffer: list[str]):
+    while True:
+        line = await reader.readline()
+        if not line:
+            break
+        buffer.append(line.decode())
+
+
+class Process:
+    def __init__(self) -> None:
+        self.proc: asyncio.subprocess.Process | None = None
+        self.stdout_buffer: list[str] = []
+        self.stderr_buffer: list[str] = []
+
+    @property
+    def was_run(self) -> bool:
+        return self.proc is not None
+
+    async def shell(self, line: str):
+        self.proc = await asyncio.create_subprocess_shell(
+            line,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            stdin=asyncio.subprocess.PIPE,
+        )
+        asyncio.create_task(read_stream(self.proc.stdout, self.stdout_buffer))
+        asyncio.create_task(read_stream(self.proc.stderr, self.stderr_buffer))
+
+    async def user_input(self, line: str | None):
+        if line is None:
+            return
+        assert self.proc is not None
+        assert self.proc.stdin is not None
+        self.proc.stdin.write(line.encode() + b'\n')
+        await self.proc.stdin.drain()
+
+    def clear_buffer(self):
+        self.stdout_buffer.clear()
+        self.stderr_buffer.clear()
+
+    async def wait(self, seconds: float = 1) -> tuple[str, str]:
+        assert self.proc is not None
+        start_time = time.time()
+        while self.proc.returncode is None and time.time() - start_time < seconds:
+            await asyncio.sleep(0.1)
+
+        if self.proc.returncode is not None:
+            self.proc = None
+
+        stdout = '\n'.join(self.stdout_buffer)
+        stderr = '\n'.join(self.stderr_buffer)
+        self.clear_buffer()
+        return stdout, stderr

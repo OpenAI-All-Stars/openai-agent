@@ -15,16 +15,18 @@ class Func(str, Enum):
 FUNCTIONS = [
     {
         'name': Func.bash_command,
-        'description': 'Execute bash command',
+        'description': 'Execute bash command, returns output after execution completes or after 1 second',
         'parameters': {
             'type': 'object',
             'properties': {
-                'command': {
+                'stdin': {
                     'type': 'string',
-                    'description': 'Bash command line',
+                    'description': (
+                        'Bash command line or user input line.'
+                        'Can be skipped if new output needs to be viewed.'
+                    ),
                 },
             },
-            'required': ['command'],
         },
     },
     {

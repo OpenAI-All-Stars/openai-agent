@@ -1,9 +1,8 @@
-import asyncio
 import json
 
 from colorama import Fore, Style
 
-from openai_agent.repositories import http_openai, project_files
+from openai_agent.repositories import http_openai, project_files, bash
 from openai_agent.utils import spinning_ctx
 
 
@@ -56,23 +55,18 @@ async def function_match(messages: list[dict], function_call: dict):
         case http_openai.Func.bash_command:
             raw_args = function_call['arguments']
             function_args = json.loads(raw_args)
-            command = function_args.get('command')
-            if not command:
-                raise Exception('команда не указана')
+            stdin = function_args.get('stdin')
+            if stdin is None:
+                raise Exception('stdin не указан')
 
-            print_fn('bash: {}'.format(command))
+            print_fn('bash: {}'.format(stdin))
 
-            proc = await asyncio.create_subprocess_shell(
-                command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await proc.communicate()
+            std = await bash.execute(stdin)
 
             messages.append({
                 'role': 'function',
                 'name': function_name,
-                'content': '\n'.join((stdout.decode('utf-8'), stderr.decode('utf-8'))),
+                'content': std.all,
             })
         case http_openai.Func.list_files:
             raw_args = function_call['arguments']
