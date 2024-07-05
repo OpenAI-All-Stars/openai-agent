@@ -56,8 +56,6 @@ async def function_match(messages: list[dict], function_call: dict):
             raw_args = function_call['arguments']
             function_args = json.loads(raw_args)
             stdin = function_args.get('stdin')
-            if stdin is None:
-                raise Exception('stdin не указан')
 
             print_fn('bash: {}'.format(stdin))
 
