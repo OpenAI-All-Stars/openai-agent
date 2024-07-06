@@ -16,6 +16,7 @@ setup(
         "click==8.1.7",
         "colorama==0.4.6",
         "python_dotenv==1.0.1",
+        "backoff==1.11.1"
     ],
     extras_require={
         "dev": [

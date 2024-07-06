@@ -33,7 +33,13 @@ class Developer:
 async def function_loop(messages: list[dict]):
     while True:
         with spinning_ctx():
-            resp = await http_openai.send('developer', messages)
+            try:
+                resp = await http_openai.send('developer', messages)
+            except KeyboardInterrupt as e:
+                messages.append({
+                    'role': 'system',
+                    'content': str(e),
+                })
         response_message = resp.choices[0].message
 
         function_call = response_message.get('function_call')

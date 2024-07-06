@@ -4,7 +4,6 @@ from click.testing import CliRunner
 from openai_agent.cli import cli
 
 
-
 @patch.object(builtins, 'input', lambda _: '')
 def test_cli_run_with_arg(mock_dependencies):
     runner = CliRunner()

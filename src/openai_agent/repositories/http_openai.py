@@ -1,7 +1,8 @@
-from enum import Enum
 import os
 import openai
 from openai.openai_object import OpenAIObject
+from enum import Enum
+import backoff
 
 
 class Func(str, Enum):
@@ -92,6 +93,7 @@ FUNCTIONS = [
 ]
 
 
+@backoff.on_exception(backoff.expo, Exception, max_tries=2)
 async def send(user: str, messages: list[dict]) -> OpenAIObject:
     openai.proxy = os.getenv('PROXY')  # type: ignore
     return await openai.ChatCompletion.acreate(
