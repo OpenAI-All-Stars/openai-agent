@@ -8,10 +8,9 @@ from openai_agent.services import ai_agent
 async def run(task: str, context: bool):
     readline.parse_and_bind("tab: complete")
 
-    if context:
+    messages = []
+    if context and file_history.exists():
         messages = file_history.load()
-    else:
-        messages = []
 
     developer = ai_agent.Developer(messages)
     if not task:

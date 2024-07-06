@@ -16,5 +16,5 @@ pipx install git+https://github.com/OpenAI-All-Stars/openai-agent.git
 ## Пример использования
 
 ```
-openai-agent run
+openai-agent --context
 ```

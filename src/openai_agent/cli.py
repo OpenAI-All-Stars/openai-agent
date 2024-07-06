@@ -8,23 +8,20 @@ from openai_agent.services import cli_loop
 from openai_agent.utils import async_command
 
 
-@click.group()
-def cli() -> None:
-    logging.basicConfig(level=logging.ERROR)
-
-    colorama.init()
-    dotenv.init()
-
-    dotenv.set_secret('OPENAI_API_KEY')
-    dotenv.set_secret('PROXY')
-
-
-@cli.command()
+@click.command()
 @click.option('--task')
 @click.option('--context/--no-context', default=False, help='Load previous context.')
 @async_command
-async def run(task: str, context: bool) -> None:
+async def cli(task: str, context: bool) -> None:
     try:
+        logging.basicConfig(level=logging.ERROR)
+
+        colorama.init()
+        dotenv.init()
+
+        dotenv.set_secret('OPENAI_API_KEY')
+        dotenv.set_secret('PROXY')
+
         await cli_loop.run(task, context)
     except KeyboardInterrupt:
         pass
