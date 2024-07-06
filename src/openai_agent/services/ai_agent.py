@@ -23,7 +23,6 @@ class Developer:
         self.messages.append(
             {'role': 'user', 'content': task},
         )
-        file_history.save(self.messages)
         tmp_messages = self.messages.copy()
         response_message = await function_loop(tmp_messages)
         self.messages.append(response_message)
