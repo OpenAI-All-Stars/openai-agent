@@ -21,9 +21,10 @@ def cli() -> None:
 
 @cli.command()
 @click.option('--task')
+@click.option('--context/--no-context', default=False, help='Load previous context.')
 @async_command
-async def run(task: str) -> None:
+async def run(task: str, context: bool) -> None:
     try:
-        await cli_loop.run(task)
+        await cli_loop.run(task, context)
     except KeyboardInterrupt:
         pass
