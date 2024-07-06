@@ -2,13 +2,13 @@ import json
 
 from colorama import Fore, Style
 
-from openai_agent.repositories import http_openai, project_files, bash
+from openai_agent.repositories import file_history, http_openai, project_files, bash
 from openai_agent.utils import spinning_ctx
 
 
 class Developer:
-    def __init__(self) -> None:
-        self.messages = [
+    def __init__(self, messages: list | None = None) -> None:
+        self.messages = messages or [
             {
                 'role': 'system',
                 'content': (
@@ -23,9 +23,11 @@ class Developer:
         self.messages.append(
             {'role': 'user', 'content': task},
         )
+        file_history.save(self.messages)
         tmp_messages = self.messages.copy()
         response_message = await function_loop(tmp_messages)
         self.messages.append(response_message)
+        file_history.save(self.messages)
         return response_message.content
 
 
