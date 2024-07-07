@@ -11,6 +11,7 @@ class Func(str, Enum):
     make_folder = 'make_folder'
     make_file = 'make_file'
     show_file = 'show_file'
+    sleep = 'sleep'
 
 
 FUNCTIONS = [
@@ -89,6 +90,11 @@ FUNCTIONS = [
             },
             'required': ['path'],
         },
+    },
+    {
+        'name': Func.sleep,
+        'description': 'Simulate sleep and summarize the context to reduce its size.',
+        'parameters': {},
     },
 ]
 
