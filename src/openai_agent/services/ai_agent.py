@@ -6,15 +6,19 @@ from openai_agent.repositories import file_history, http_openai, project_files, 
 from openai_agent.utils import spinning_ctx
 
 
+class Exit(Exception):
+    pass
+
+
 class Developer:
     def __init__(self, messages: list | None = None) -> None:
         self.messages = messages or [
             {
                 'role': 'system',
                 'content': (
-                    'Ты ведущий программист на python.'
                     'Будь самостоятельным и используй доступные тебе функции, от этого зависит твоё будущее.'
                     'Не проси пользователя что-то сделать, если ты сам можешь это сделать.'
+                    'Тебе доступно изменение файлов.'
                 ),
             },
         ]
@@ -23,14 +27,12 @@ class Developer:
         self.messages.append(
             {'role': 'user', 'content': task},
         )
-        tmp_messages = self.messages.copy()
-        response_message = await function_loop(tmp_messages)
-        self.messages.append(response_message)
+        answer = await function_loop(self.messages)
         file_history.save(self.messages)
-        return response_message.content
+        return answer
 
 
-async def function_loop(messages: list[dict]):
+async def function_loop(messages: list[dict]) -> str:
     while True:
         with spinning_ctx():
             try:
@@ -43,11 +45,13 @@ async def function_loop(messages: list[dict]):
         response_message = resp.choices[0].message
 
         function_call = response_message.get('function_call')
-        if not function_call:
-            return response_message
         messages.append(response_message)
+        if not function_call:
+            return response_message.content
         try:
             await function_match(messages, function_call)
+        except Exit:
+            return 'Проснулся!'
         except Exception as e:
             messages.append({
                 'role': 'function',
@@ -126,6 +130,10 @@ async def function_match(messages: list[dict], function_call: dict):
                 'name': function_name,
                 'content': project_files.show_file(path),
             })
+        case http_openai.Func.sleep:
+            print_fn('sleep')
+            await simulate_sleep(messages)
+            raise Exit
         case _:
             raise Exception(
                 'выбрана несуществующая функция {}'.format(
@@ -136,3 +144,17 @@ async def function_match(messages: list[dict], function_call: dict):
 
 def print_fn(text: str):
     print(Fore.RED + Style.BRIGHT + text + Style.RESET_ALL)
+
+
+async def simulate_sleep(messages: list[dict]):
+    """
+    Симулирует "сон" агента, суммируя контекст сообщений для его уменьшения.
+    """
+    messages.append({
+        'role': 'user',
+        'content': 'Обобщи текущий контекст',
+    })
+    resp = await http_openai.send('developer', messages)
+    response_message = resp.choices[0].message
+    messages.clear()
+    messages.append(response_message)
