@@ -16,13 +16,25 @@ class BashResult:
         return '\n'.join((self.stdout, self.stderr))
 
 
-async def execute(command: str | None) -> BashResult:
+async def execute(command: str) -> BashResult:
     global PROC
     if PROC.was_run:
-        await PROC.user_input(command)
+        raise Exception('Сейчас уже есть запущенная bash команда')
     else:
-        assert command is not None
         await PROC.shell(command)
+    stdout, stderr = await PROC.wait()
+    return BashResult(
+        stdout=stdout,
+        stderr=stderr,
+    )
+
+
+async def connect(stdin: str | None) -> BashResult:
+    global PROC
+    if PROC.was_run:
+        await PROC.user_input(stdin)
+    else:
+        raise Exception('Сейчас нет запущенной bash команды')
     stdout, stderr = await PROC.wait()
     return BashResult(
         stdout=stdout,

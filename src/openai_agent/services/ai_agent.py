@@ -66,11 +66,38 @@ async def function_match(messages: list[dict], function_call: dict):
         case http_openai.Func.bash_command:
             raw_args = function_call['arguments']
             function_args = json.loads(raw_args)
+            command = function_args.get('command')
+            if not command:
+                raise Exception('команда не указана')
+
+            print_fn('bash: {}'.format(command))
+
+            std = await bash.execute(command)
+
+            messages.append({
+                'role': 'function',
+                'name': function_name,
+                'content': std.all,
+            })
+        case http_openai.Func.bash_connect:
+            print_fn('bash connect')
+            std = await bash.connect(None)
+
+            messages.append({
+                'role': 'function',
+                'name': function_name,
+                'content': std.all,
+            })
+        case http_openai.Func.bash_user_input:
+            raw_args = function_call['arguments']
+            function_args = json.loads(raw_args)
             stdin = function_args.get('stdin')
+            if not stdin:
+                raise Exception('строка ввода не указана')
 
-            print_fn('bash: {}'.format(stdin))
+            print_fn('bash user input: {}'.format(stdin))
 
-            std = await bash.execute(stdin)
+            std = await bash.connect(stdin)
 
             messages.append({
                 'role': 'function',
