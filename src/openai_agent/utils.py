@@ -96,6 +96,11 @@ class Process:
         assert self.proc.stdin is not None
         self.proc.stdin.write(line.encode() + b'\n')
         await self.proc.stdin.drain()
+    
+    async def terminate(self):
+        if self.proc:
+            self.proc.terminate()
+            await self.proc.wait()
 
     def clear_buffer(self):
         self.stdout_buffer.clear()
