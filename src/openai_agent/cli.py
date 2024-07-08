@@ -3,6 +3,7 @@ import logging
 import click
 import colorama
 
+from openai_agent import deps
 from openai_agent.repositories import dotenv
 from openai_agent.services import cli_loop
 from openai_agent.utils import async_command
@@ -22,6 +23,7 @@ async def cli(task: str, context: bool) -> None:
         dotenv.set_secret('OPENAI_API_KEY')
         dotenv.set_secret('PROXY')
 
-        await cli_loop.run(task, context)
+        async with deps.use_all():
+            await cli_loop.run(task, context)
     except KeyboardInterrupt:
         pass

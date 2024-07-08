@@ -15,6 +15,8 @@ class Func(str, Enum):
     make_file = 'make_file'
     show_file = 'show_file'
     sleep = 'sleep'
+    web_search = 'web_search'
+    web_read = 'web_read'
 
 
 FUNCTIONS = [
@@ -126,17 +128,50 @@ FUNCTIONS = [
         'description': 'Simulate sleep and summarize the context to reduce its size.',
         'parameters': {},
     },
+    {
+        'name': Func.web_read,
+        'description': 'Open url and read it, return text as markdown',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'url': {
+                    'type': 'string',
+                },
+            },
+            'required': ['url'],
+        },
+    },
+]
+
+YANDEX_FUNCTIONS = [
+    {
+        'name': Func.web_search,
+        'description': 'Internet search engine Yandex',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'quary': {
+                    'type': 'string',
+                    'description': 'Search quary',
+                },
+            },
+            'required': ['quary'],
+        },
+    },
 ]
 
 
 @backoff.on_exception(backoff.expo, Exception, max_tries=2)
 async def send(user: str, messages: list[dict]) -> OpenAIObject:
     openai.proxy = os.getenv('PROXY')  # type: ignore
+    fns = FUNCTIONS.copy()
+    if os.getenv('YANDEX_SEARCH_API_KEY') and os.getenv('YANDEX_FOLDERID'):
+        fns.extend(YANDEX_FUNCTIONS)
     return await openai.ChatCompletion.acreate(
         api_key=os.getenv('OPENAI_API_KEY'),
         model='gpt-4o',
         messages=messages,
-        functions=FUNCTIONS,
+        functions=fns,
         function_call='auto',
         user=user,
     )
