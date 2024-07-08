@@ -40,3 +40,9 @@ async def connect(stdin: str | None) -> BashResult:
         stdout=stdout,
         stderr=stderr,
     )
+
+
+async def terminate():
+    global PROC
+    if PROC.was_run:
+        await PROC.terminate()

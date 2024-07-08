@@ -88,6 +88,15 @@ async def function_match(messages: list[dict], function_call: dict):
                 'name': function_name,
                 'content': std.all,
             })
+        case http_openai.Func.bash_terminate:
+            print_fn('bash terminate')
+            await bash.terminate()
+
+            messages.append({
+                'role': 'function',
+                'name': function_name,
+                'content': 'terminated',
+            })
         case http_openai.Func.bash_user_input:
             raw_args = function_call['arguments']
             function_args = json.loads(raw_args)

@@ -8,6 +8,7 @@ import backoff
 class Func(str, Enum):
     bash_command = 'bash_command'
     bash_connect = 'bash_connect'
+    bash_terminate = 'bash_terminate'
     bash_user_input = 'bash_user_input'
     list_files = 'list_files'
     make_folder = 'make_folder'
@@ -19,7 +20,10 @@ class Func(str, Enum):
 FUNCTIONS = [
     {
         'name': Func.bash_command,
-        'description': 'Execute bash command, returns output after execution completes or after 1 second',
+        'description': (
+            'Execute bash command, returns output after execution '
+            'completes or after 1 second (for next output use bash_connect)'
+        ),
         'parameters': {
             'type': 'object',
             'properties': {
@@ -36,6 +40,11 @@ FUNCTIONS = [
     {
         'name': Func.bash_connect,
         'description': 'Show new output of running bash command.',
+        'parameters': {},
+    },
+    {
+        'name': Func.bash_terminate,
+        'description': 'Terminate running bash command.',
         'parameters': {},
     },
     {
