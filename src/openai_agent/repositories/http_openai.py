@@ -7,6 +7,8 @@ import backoff
 
 class Func(str, Enum):
     bash_command = 'bash_command'
+    bash_connect = 'bash_connect'
+    bash_user_input = 'bash_user_input'
     list_files = 'list_files'
     make_folder = 'make_folder'
     make_file = 'make_file'
@@ -21,14 +23,33 @@ FUNCTIONS = [
         'parameters': {
             'type': 'object',
             'properties': {
-                'stdin': {
+                'command': {
                     'type': 'string',
                     'description': (
-                        'Bash command line or user input line.'
-                        'Can be skipped if new output needs to be viewed.'
+                        'Bash command line.'
                     ),
                 },
             },
+            'required': ['command'],
+        },
+    },
+    {
+        'name': Func.bash_connect,
+        'description': 'Show new output of running bash command.',
+        'parameters': {},
+    },
+    {
+        'name': Func.bash_user_input,
+        'description': 'Input line to stdin for running bash command.',
+        'parameters': {
+            'type': 'object',
+            'properties': {
+                'stdin': {
+                    'type': 'string',
+                    'description': 'User input line.'
+                },
+            },
+            'required': ['stdin'],
         },
     },
     {
