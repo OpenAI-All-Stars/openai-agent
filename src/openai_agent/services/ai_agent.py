@@ -2,7 +2,13 @@ import json
 
 from colorama import Fore, Style
 
-from openai_agent.repositories import file_history, http_openai, project_files, bash
+from openai_agent.repositories import (
+    file_history,
+    http_openai,
+    http_text_browser,
+    http_yandex_search,
+    project_files, bash,
+)
 from openai_agent.utils import spinning_ctx
 
 
@@ -69,11 +75,8 @@ async def function_match(messages: list[dict], function_call: dict):
             command = function_args.get('command')
             if not command:
                 raise Exception('команда не указана')
-
             print_fn('bash: {}'.format(command))
-
             std = await bash.execute(command)
-
             messages.append({
                 'role': 'function',
                 'name': function_name,
@@ -82,7 +85,6 @@ async def function_match(messages: list[dict], function_call: dict):
         case http_openai.Func.bash_connect:
             print_fn('bash connect')
             std = await bash.connect(None)
-
             messages.append({
                 'role': 'function',
                 'name': function_name,
@@ -91,7 +93,6 @@ async def function_match(messages: list[dict], function_call: dict):
         case http_openai.Func.bash_terminate:
             print_fn('bash terminate')
             await bash.terminate()
-
             messages.append({
                 'role': 'function',
                 'name': function_name,
@@ -103,11 +104,8 @@ async def function_match(messages: list[dict], function_call: dict):
             stdin = function_args.get('stdin')
             if not stdin:
                 raise Exception('строка ввода не указана')
-
             print_fn('bash user input: {}'.format(stdin))
-
             std = await bash.connect(stdin)
-
             messages.append({
                 'role': 'function',
                 'name': function_name,
@@ -170,6 +168,32 @@ async def function_match(messages: list[dict], function_call: dict):
             print_fn('sleep')
             await simulate_sleep(messages)
             raise Exit
+        case http_openai.Func.web_search:
+            raw_args = function_call['arguments']
+            function_args = json.loads(raw_args)
+            quary = function_args.get('quary')
+            if not quary:
+                raise Exception('quary не указан')
+            print_fn('web search {}'.format(quary))
+            content = await http_yandex_search.search(quary)
+            messages.append({
+                'role': 'function',
+                'name': function_name,
+                'content': content,
+            })
+        case http_openai.Func.web_read:
+            raw_args = function_call['arguments']
+            function_args = json.loads(raw_args)
+            url = function_args.get('url')
+            if not url:
+                raise Exception('url не указан')
+            print_fn('open {}'.format(url))
+            content = await http_text_browser.read(url)
+            messages.append({
+                'role': 'function',
+                'name': function_name,
+                'content': content,
+            })
         case _:
             raise Exception(
                 'выбрана несуществующая функция {}'.format(

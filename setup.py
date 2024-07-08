@@ -16,7 +16,9 @@ setup(
         "click==8.1.7",
         "colorama==0.4.6",
         "python_dotenv==1.0.1",
-        "backoff==1.11.1"
+        "backoff==1.11.1",
+        "aiohttp==3.9.5",
+        "markdownify==0.12.1"
     ],
     extras_require={
         "dev": [
